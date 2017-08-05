@@ -1,0 +1,63 @@
+extends layout
+
+
+
+block style
+    style.
+        #map {
+            height: 100%;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+
+block content
+  if (user)
+    p=user.username
+    a(href='/logout') Logout
+  else
+    p how did you get here without login in?
+    a(href='/login') login
+
+
+
+block map
+    div(id="map")
+
+
+block chat
+    ul#messages
+        form(action="")
+            input#m(autocomplete="off" required)
+            button Send
+
+block script
+    script(src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4FlnSz-fa_ZK0TSSYDjFBsqP05Sfg2lk&callback=initMap" async defer)
+
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js")
+    script.
+        var socket = io();
+        $('form').submit(function () {
+            socket.emit('chat', $('#m').val());
+            $('#m').val('');
+            return false;
+        })
+        socket.on('chat broadcast', function (txt) {
+            console.log(txt)
+            var msg = $('<li>').text(txt)
+            console.log(msg)
+            $('#messages').append(msg)
+        })
+    script.
+        function initMap() {
+            // Create a map object and specify the DOM element for display.
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: -34.397, lng: 150.644},
+                scrollwheel: false,
+                zoom: 8
+            });
+        }

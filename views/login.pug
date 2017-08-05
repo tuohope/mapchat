@@ -1,0 +1,8 @@
+extends layout
+block content
+    form(method="POST", action="/login")
+        input(name="username", placeholder="Username")
+        input(name="password", type="password", placeholder="Password")
+        input(type="submit", value="Login")
+
+    a(href='/signup') signup
