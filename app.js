@@ -8,9 +8,9 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser')
 
 
-var routes = require('./routes/routes');
 
-var User = require('./models/user');
+
+
 
 var app = express();
 var server = http.createServer(app);
@@ -21,6 +21,12 @@ var socket = require('./socket')(io);
 var mongoose = require('mongoose');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+
+
+module.exports = {app : app, io: io};
+
+var routes = require('./routes/routes');
+var User = require('./models/user');
 
 mongoose.connect('mongodb://tuo:123@ds056789.mlab.com:56789/mapchat');
 
@@ -151,4 +157,4 @@ function onListening() {
     debug('Listening on ' + bind);
 }
 
-module.exports = app;
+

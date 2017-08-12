@@ -6,6 +6,41 @@ block style
     style.
         #map {
             height: 100%;
+            width:70%;
+            position: fixed;
+            left : 0;
+            top : 0;
+
+        }
+        #chat{
+            height: 100%;
+            width: 30%;
+            position: absolute;
+            right : 0;
+            top : 0;
+            background-color: red;
+        }
+        #input{
+            position: absolute;
+            height:10%;
+            width: 100%;
+            bottom : 0;
+            background-color: #00B7FF;
+        }
+        #messages{
+            position: absolute;
+            height:80%;
+            width:100%;
+            top : 10%;
+            bottom : 10%;
+            background-color: chartreuse;
+            overflow: scroll;
+        }
+        #profile{
+            position:absolute;
+            height:10%;
+            width: 100%;
+            top : 0;
         }
 
         html, body {
@@ -13,27 +48,21 @@ block style
             margin: 0;
             padding: 0;
         }
-
-
-block content
-  if (user)
-    p=user.username
-    a(href='/logout') Logout
-  else
-    p how did you get here without login in?
-    a(href='/login') login
-
-
-
 block map
     div(id="map")
 
 
 block chat
-    ul#messages
-        form(action="")
-            input#m(autocomplete="off" required)
-            button Send
+    div(id="chat")
+        div(id="profile")
+            p= "logged in as " + user.username + "."
+            a(href='/logout') Logout
+        ul(id="messages")
+
+        div(id="input")
+            form(action="")
+                input(id="m" autocomplete="off" required)
+                button Send
 
 block script
     script(src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4FlnSz-fa_ZK0TSSYDjFBsqP05Sfg2lk&callback=initMap" async defer)
@@ -42,22 +71,40 @@ block script
     script.
         var socket = io();
         $('form').submit(function () {
-            socket.emit('chat', $('#m').val());
+            socket.emit('chat', {user : #{user.username},
+                                 message : $('#m').val()});
             $('#m').val('');
             return false;
         })
-        socket.on('chat broadcast', function (txt) {
-            console.log(txt)
-            var msg = $('<li>').text(txt)
+        socket.on('chat broadcast', function (data) {
+            console.log(data)
+            var m = data.user + ": " + data.message;
+
+            var msg = $('<li>').text(m)
             console.log(msg)
             $('#messages').append(msg)
         })
+        socket.on('user login',function (data) {
+            console.log(data);
+        })
+        socket.on('user logout',function (data) {
+            console.log(data);
+        })
+
+
     script.
         function initMap() {
             // Create a map object and specify the DOM element for display.
             var map = new google.maps.Map(document.getElementById('map'), {
-                center: {lat: -34.397, lng: 150.644},
-                scrollwheel: false,
-                zoom: 8
+                center: {lat: 49.2785069, lng: -123.1112388},
+                scrollwheel: true,
+                zoom: 14
             });
         }
+
+    script.
+        $(function () {
+            $.get("/api/user", function (data, status) {
+                console.log(data);
+            });
+        })
